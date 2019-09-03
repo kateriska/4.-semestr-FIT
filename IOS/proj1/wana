@@ -1,0 +1,945 @@
+#!/bin/sh
+
+# Autor: Katerina Fortova (xforto00)
+# Ukol: IOS - skript wana
+# Datum: brezen 2019
+# Testovano na: GNU Ubuntu, merlin, eva
+
+export POSIXLY_CORRECT=yes
+
+if [ "$(uname)" = "Linux" ]; then
+  SEDFNC="sed"
+else
+  SEDFNC="gsed"
+fi
+
+# uprava a porovnani data:
+D_AB()
+{
+  DATE_AB=$(cat "$var" | cut -d ' ' -f4,5 | uniq | sed 's/\[//g'| sed 's/\]//g' | tr '/' '-' | sed '/:/s// /' | cut -d ' ' -f1,2 | sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" | awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'| sed 's/\-//g' | sed 's/\://g' | sed 's/ //g' | awk -v d1="$DTA" -v d2="$DTB" '{if ( $1 > d1 &&  $1 < d2) print $0}')
+}
+D_ABGZ()
+{
+  DATE_AB=$(gunzip -c "$var" | cut -d ' ' -f4,5 | uniq | sed 's/\[//g'| sed 's/\]//g' | tr '/' '-' | sed '/:/s// /' | cut -d ' ' -f1,2 | sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" | awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'| sed 's/\-//g' | sed 's/\://g' | sed 's/ //g' | awk -v d1="$DTA" -v d2="$DTB" '{if ( $1 > d1 &&  $1 < d2) print $0}')
+}
+D_A()
+{
+  DATE_A=$(cat "$var" | cut -d ' ' -f4,5 | uniq | sed 's/\[//g'| sed 's/\]//g' | tr '/' '-' | sed '/:/s// /' | cut -d ' ' -f1,2 | sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/"  | awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'| sed 's/\-//g' | sed 's/\://g' | sed 's/ //g' | awk -v d="$DTA" '{if ($1 > d) {print $0;}}')
+}
+D_AGZ()
+{
+  DATE_A=$(gunzip -c "$var" | cut -d ' ' -f4,5 | uniq | sed 's/\[//g'| sed 's/\]//g' | tr '/' '-' | sed '/:/s// /' | cut -d ' ' -f1,2 | sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/"  | awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'| sed 's/\-//g' | sed 's/\://g' | sed 's/ //g' | awk -v d="$DTA" '{if ($1 > d) {print $0;}}')
+}
+D_B()
+{
+  DATE_B=$(cat "$var" | cut -d ' ' -f4,5 | uniq | sed 's/\[//g'| sed 's/\]//g' | tr '/' '-' | sed '/:/s// /' | cut -d ' ' -f1,2 | sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/"  | awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'| sed 's/\-//g' | sed 's/\://g' | sed 's/ //g' | awk -v d="$DTB" '{if ($1 < d) {print $0;}}')
+}
+D_BGZ()
+{
+  DATE_B=$(gunzip -c "$var" | cut -d ' ' -f4,5 | uniq | sed 's/\[//g'| sed 's/\]//g' | tr '/' '-' | sed '/:/s// /' | cut -d ' ' -f1,2 | sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/"  | awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'| sed 's/\-//g' | sed 's/\://g' | sed 's/ //g' | awk -v d="$DTB" '{if ($1 < d) {print $0;}}')
+}
+
+DAT()
+{
+  DATE=$(echo $d | awk '{print substr($0,7,2) substr($0,5,2) substr($0,1,4) substr($0,9,6) }' | sed 's/./&:/8'| sed 's/./&:/11' | sed 's/./&:/14' | sed 's,.,&/,2' | sed 's,.,&/,5' | sed -e "s/\/01\//\/Jan\//" -e "s/\/02\//\/Feb\//" -e "s/\/03\//\/Mar\//" -e "s/\/04\//\/Apr\//" -e "s/\/05\//\/May\//" -e "s/\/06\//\/Jun\//" -e "s/\/07\//\/Jul\//" -e "s/\/08\//\/Aug\//" -e "s/\/09\//\/Sep\//" -e "s/\/10\//\/Oct\//" -e "s/\/11\//\/Nov\//" -e "s/\/12\//\/Dec\//")
+}
+
+# zjisteni domenoveho jmena:
+HOSTS()
+{
+  if [ -z "$IP" ]; then
+    continue
+  fi
+  HOST=$(host $IP | cut -d ' ' -f5 )
+  if [  "$HOST" = "3(NXDOMAIN)" ] || [ "$HOST" = "2(SERVFAIL)" ]; then
+    echo $adress
+  else
+    echo $HOST
+  fi
+}
+HOSTS_B()
+{
+  for adress in $IP; do
+    HOST=$(host $adress | cut -d ' ' -f5 )
+    if [  "$HOST" = "3(NXDOMAIN)" ] || [ "$HOST" = "2(SERVFAIL)" ]; then
+      echo $adress
+    else
+      echo $HOST
+    fi
+  done
+}
+
+# vypis histogramu hist-ip:
+H_IP_LOG()
+{
+  if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+    if [ ! -z $DATE ] && [ ! -z $IPADDR ] && [ ! -z $URI ]; then
+      IHIST=$(cat $var|grep $DATE|grep $IPADDR|grep $URI|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $DATE ] && [ ! -z $IPADDR ]; then
+      IHIST=$(cat $var|grep $DATE|grep $IPADDR|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $DATE ] && [ ! -z $URI ]; then
+      IHIST=$(cat $var|grep $DATE|grep $URI|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $IPADDR ] && [ ! -z $URI ]; then
+      IHIST=$(cat $var|grep $IPADDR|grep $URI|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $DATE ]; then
+      IHIST=$(cat $var|grep $DATE|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $IPADDR ]; then
+      IHIST=$(cat $var|grep $IPADDR|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $URI ]; then
+      IHIST=$(cat $var|grep $URI|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ -z $DATE ] && [ -z $IPADDR ] && [ -z $URI ]; then
+      IHIST=$(cat $var|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    fi
+  elif [ "$S_CUT" = "gz" ]; then
+    if [ ! -z $DATE ] && [ ! -z $IPADDR ] && [ ! -z $URI ]; then
+      IHIST=$(gunzip -c $var|grep $DATE|grep $IPADDR|grep $URI|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $DATE ] && [ ! -z $IPADDR ]; then
+      IHIST=$(gunzip -c $var|grep $DATE|grep $IPADDR|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $DATE ] && [ ! -z $URI ]; then
+      IHIST=$(gunzip -c $var|grep $DATE|grep $URI|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $IPADDR ] && [ ! -z $URI ]; then
+      IHIST=$(gunzip -c $var|grep $IPADDR|grep $URI|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $DATE ]; then
+      IHIST=$(gunzip -c $var|grep $DATE|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $IPADDR ]; then
+      IHIST=$(gunzip -c $var|grep $IPADDR|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ ! -z $URI ]; then
+      IHIST=$(gunzip -c $var|grep $URI|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    elif [ -z $DATE ] && [ -z $IPADDR ] && [ -z $URI ]; then
+      IHIST=$(gunzip -c $var|cut -d ' ' -f1|sort|uniq -c|sort -nr|awk '{ $1="";print }'|sed 's/^[ \t]*//;s/[ \t]*$//')
+    fi
+  fi
+
+  for hist in $IHIST; do
+    if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+      NUM_OCUR=$(grep $hist $var|wc -l)
+    elif [ "$S_CUT" = "gz" ]; then
+      NUM_OCUR=$(gunzip -c $var | grep $hist |wc -l)
+    fi
+    NUM_NUM=$(echo $NUM_OCUR)
+    HASH="#"
+    COUNT=$(awk -v hash="$HASH" -v num="$NUM_NUM" 'BEGIN { for (i = 0; i < num; i++) {printf hash;} }')
+    echo "${hist} (${NUM_NUM}): $COUNT"
+  done
+}
+# vypis histogramu hist-load:
+HISTOLOAD()
+{
+  if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+    if [ ! -z $DATE ] && [ ! -z $IPADDR ] && [ ! -z $URI ]; then
+      LOAD=$(cat $var|grep $DATE|grep $IPADDR|grep $URI|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $DATE ] && [ ! -z $IPADDR ]; then
+      LOAD=$(cat $var|grep $DATE|grep $IPADDR|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $DATE ] && [ ! -z $URI ]; then
+      LOAD=$(cat $var|grep $DATE|grep $URI|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $IPADDR ] && [ ! -z $URI ]; then
+      LOAD=$(cat $var|grep $IPADDR|grep $URI|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $DATE ]; then
+      LOAD=$(cat $var|grep $DATE|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $IPADDR ]; then
+      LOAD=$(cat $var|grep $IPADDR|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $URI ]; then
+      LOAD=$(cat $var|grep $URI|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ -z $DATE ] && [ -z $IPADDR ] && [ -z $URI ]; then
+      LOAD=$(cat $var|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    fi
+  elif [ "$S_CUT" = "gz" ]; then
+    if [ ! -z $DATE ] && [ ! -z $IPADDR ] && [ ! -z $URI ]; then
+      LOAD=$(gunzip -c $var|grep $DATE|grep $IPADDR|grep $URI|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $DATE ] && [ ! -z $IPADDR ]; then
+      LOAD=$(gunzip -c $var|grep $DATE|grep $IPADDR|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $DATE ] && [ ! -z $URI ]; then
+      LOAD=$(gunzip -c $var|grep $DATE|grep $URI|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $IPADDR ] && [ ! -z $URI ]; then
+      LOAD=$(gunzip -c $var|grep $IPADDR|grep $URI|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $DATE ]; then
+      LOAD=$(gunzip -c $var|grep $DATE|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $IPADDR ]; then
+      LOAD=$(gunzip -c $var|grep $IPADDR|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ ! -z $URI ]; then
+      LOAD=$(gunzip -c $var|grep $URI|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    elif [ -z $DATE ] && [ -z $IPADDR ] && [ -z $URI ]; then
+      LOAD=$(gunzip -c $var|cut -d ' ' -f4|rev|cut -c 4-|rev|sed 's/\[//g'|tr '/' '-'|sed -e "s/Jan/01/" -e "s/Feb/02/" -e "s/Mar/03/" -e "s/Apr/04/" -e "s/May/05/" -e "s/Jun/06/" -e "s/Jul/07/" -e "s/Aug/08/" -e "s/Sep/09/" -e "s/Oct/10/" -e "s/Nov/11/" -e "s/Dec/12/" |sed 's/..$/00/'|sed 's/..$/00/'|rev|sed 's/:/ /2'|rev|awk '{print substr($0,7,4) substr($0,3,4) substr($0,1,2) substr($0,11,9) }'|uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'|tr ' ' '-')
+    fi
+  fi
+
+  for hist in $LOAD; do
+    NUM_LOAD=$(echo $hist|cut -c 1)
+    DT_LOAD=$(echo $hist|cut -c 3-|rev|sed 's/-/ /1'|rev)
+    HASH="#"
+    COUNT_L=$(awk -v hash="$HASH" -v num_l="$NUM_LOAD" 'BEGIN { for (i = 0; i < num_l; i++) {printf hash;} }')
+    echo "${DT_LOAD} (${NUM_LOAD}): $COUNT_L"
+  done
+}
+
+# osetreni argumentu:
+if [ "$1" = "-a" ]; then
+    DTA="$2"
+    FIL1="aft"
+elif [ "$3" = "-a" ]; then
+    DTA="$4"
+    FIL1="aft"
+elif [ "$5" = "-a" ]; then
+    DTA="$6"
+    FIL1="aft"
+elif [ "$7" = "-a" ]; then
+    DTA="$8"
+    FIL1="aft"
+fi
+if [ "$1" = "-b" ]; then
+    DTB="$2"
+    FIL2="bef"
+elif [ "$3" = "-b" ]; then
+    DTB="$4"
+    FIL2="bef"
+elif [ "$5" = "-b" ]; then
+    DTB="$6"
+    FIL2="bef"
+elif [ "$7" = "-b" ]; then
+    DTB="$8"
+    FIL2="bef"
+fi
+if [ ! -z "$DTA" ]; then
+  DTA_C=$(echo "$DTA" | grep -Eq  ^[0-9]{4}-[0-9]{2}-[0-9]{2}[[:space:]][0-9]{2}:[0-9]{2}:[0-9]{2}$ && echo "ok" || echo "no")
+  if ( [ ! "$DTA_C" = "ok" ] ); then
+    echo "Chyba: Datum zadavejte ve formatu YYYY-MM-DD HH:MM:SS (napr. 2019-02-22 09:00:00)" >&2
+    exit 1
+  fi
+fi
+if [ ! -z "$DTB" ]; then
+  DTB_C=$(echo "$DTB" | grep -Eq  ^[0-9]{4}-[0-9]{2}-[0-9]{2}[[:space:]][0-9]{2}:[0-9]{2}:[0-9]{2}$ && echo "ok" || echo "no")
+  if ( [ ! "$DTB_C" = "ok" ] ); then
+    echo "Chyba: Datum zadavejte ve formatu YYYY-MM-DD HH:MM:SS (napr. 2019-02-22 09:00:00)" >&2
+    exit 1
+  fi
+fi
+DTA=$(echo $DTA | sed 's/\-//g' | sed 's/\://g' | sed 's/ //g')
+DTB=$(echo $DTB | sed 's/\-//g' | sed 's/\://g' | sed 's/ //g')
+
+if [ "$1" = "-ip" ]; then
+  IPADDR=$2
+  FIL3="ip"
+elif [ "$3" = "-ip" ]; then
+  IPADDR=$4
+  FIL3="ip"
+elif [ "$5" = "-ip" ]; then
+  IPADDR=$6
+  FIL3="ip"
+elif [ "$7" = "-ip" ]; then
+  IPADDR=$8
+  FIL3="ip"
+fi
+if [ ! -z "$IPADDR" ]; then
+  IP_4=$(echo "$IPADDR" | grep -Eq "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"  && echo "ok" || echo "no")
+  IP_6=$(echo "$IPADDR" | grep -Eq "^([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}$"  && echo "ok" || echo "no")
+  if ( [ ! "$IP_4" = "ok" ] && [ ! "$IP_6" = "ok" ]); then
+    echo "Chyba: Format IP adresy neplatny" >&2
+    exit 1
+  fi
+fi
+
+if [ "$1" = "-uri" ]; then
+  URI=$2
+  FIL4="uri"
+elif [ "$3" = "-uri" ]; then
+  URI=$4
+  FIL4="uri"
+elif [ "$5" = "-uri" ]; then
+  URI=$6
+  FIL4="uri"
+elif [ "$7" = "-uri" ]; then
+  URI=$8
+  FIL4="uri"
+fi
+
+if ([ "$1" = "list-ip" ] || [ "$2" = "list-ip" ] || [ "$3" = "list-ip" ] || [ "$4" = "list-ip" ] || [ "$5" = "list-ip" ] || [ "$6" = "list-ip" ] || [ "$7" = "list-ip" ] || [ "$8" = "list-ip" ] || [ "$9" = "list-ip" ] || [ "${10}" = "list-ip" ]); then
+  COM1="ip"
+  COM="ip"
+fi
+if ([ "$1" = "list-hosts" ] || [ "$2" = "list-hosts" ] || [ "$3" = "list-hosts" ] || [ "$4" = "list-hosts" ]  || [ "$5" = "list-hosts" ] || [ "$6" = "list-hosts" ]  || [ "$7" = "list-hosts" ] || [ "$8" = "list-hosts" ]  || [ "$9" = "list-hosts" ] || [ "${10}" = "list-hosts" ]); then
+  COM2="hosts"
+  COM="hosts"
+fi
+if ([ "$1" = "list-uri" ] || [ "$2" = "list-uri" ] || [ "$3" = "list-uri" ] || [ "$4" = "list-uri" ]  || [ "$5" = "list-uri" ] || [ "$6" = "list-uri" ]  || [ "$7" = "list-uri" ] || [ "$8" = "list-uri" ]  || [ "$9" = "list-uri" ] || [ "${10}" = "list-uri" ]); then
+  COM3="uri"
+  COM="uri"
+fi
+if ([ "$1" = "hist-ip" ] || [ "$2" = "hist-ip" ] || [ "$3" = "hist-ip" ] || [ "$4" = "hist-ip" ]  || [ "$5" = "hist-ip" ] || [ "$6" = "hist-ip" ]  || [ "$7" = "hist-ip" ] || [ "$8" = "hist-ip" ]  || [ "$9" = "hist-ip" ] || [ "${10}" = "hist-ip" ]); then
+  COM4="hist-ip"
+  COM="hist-ip"
+fi
+if ([ "$1" = "hist-load" ] || [ "$2" = "hist-load" ] || [ "$3" = "hist-load" ] || [ "$4" = "hist-load" ]  || [ "$5" = "hist-load" ] || [ "$6" = "hist-load" ]  || [ "$7" = "hist-load" ] || [ "$8" = "hist-load" ]  || [ "$9" = "hist-load" ] || [ "${10}" = "hist-load" ]); then
+  COM5="load"
+  COM="load"
+fi
+if ( ([ ! -z "$COM1" ] && ([ ! -z "$COM2" ] || [ ! -z "$COM3" ] || [ ! -z "$COM4" ] || [ ! -z "$COM5" ])) || ([ ! -z "$COM2" ] && ([ ! -z "$COM1" ] || [ ! -z "$COM3" ] || [ ! -z "$COM4" ] || [ ! -z "$COM5" ])) || ([ ! -z "$COM3" ] && ([ ! -z "$COM1" ] || [ ! -z "$COM2" ] || [ ! -z "$COM4" ] || [ ! -z "$COM5" ])) || ([ ! -z "$COM4" ] && ([ ! -z "$COM1" ] || [ ! -z "$COM2" ] || [ ! -z "$COM3" ] || [ ! -z "$COM5" ]))  || ([ ! -z "$COM5" ] && ([ ! -z "$COM1" ] || [ ! -z "$COM2" ] || [ ! -z "$COM3" ] || [ ! -z "$COM4" ])) ); then
+  echo "Chyba: Zadavejte pouze jeden prikaz" >&2
+  exit 1
+fi
+
+for last; do true; done
+LAST_ARG=$(echo $last)
+if [ ! -f $LAST_ARG ]; then
+  echo "Chyba: Soubor nenalezen" >&2
+  exit 1
+fi
+
+# nacitani souboru, filtrovani, provedeni prikazu:
+for var in "$@"
+do
+    if [ -f "$var" ]; then
+      DIR=$(realpath "$var")
+      AR=$( echo $DIR | rev | cut -d'/' -f-1 | rev)
+      S_CUT=$(echo $AR | rev | cut -f1 -d"." | rev )
+      S_COUNT=$(echo $AR | rev | cut -f2 -d"." | rev )
+      if [ ! "$S_CUT" = "log" ] && [ ! "$S_COUNT" = "log" ] &&  [ ! "$S_CUT" = "gz" ]; then
+        echo "Chyba: Zadavejte soubory .log nebo .gz" >&2
+        exit 1
+      fi
+
+      # a, b, ip, uri:
+        if [ "$FIL1" = "aft" ] && [ "$FIL2" = "bef" ] && [ "$FIL3" = "ip" ] && [ "$FIL4" = "uri" ]; then
+          if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+            D_AB $var $DTA $DTB
+            for d in $DATE_AB; do
+              DAT $d
+              if [ "$COM1" = "ip" ]; then
+                grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f1
+              elif [ "$COM2" = "hosts" ]; then
+                IP=$(grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f1)
+                HOSTS $IP
+              elif [ "$COM3" = "uri" ]; then
+                grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f7
+              elif [ "$COM4" = "hist-ip" ]; then
+                H_IP_LOG $var
+              elif [ "$COM5" = "load" ]; then
+                HISTOLOAD $var
+              elif [ -z "$COM" ]; then
+                grep $DATE $var | grep $IPADDR | grep $URI
+              fi
+            done
+          elif [ "$S_CUT" = "gz" ]; then
+            D_ABGZ $var $DTA $DTB
+            for d in $DATE_AB; do
+                DAT $d
+                if [ "$COM1" = "ip" ]; then
+                  gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f1
+                elif [ "$COM2" = "hosts" ]; then
+                  IP=$(gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f1)
+                  HOSTS $IP
+                elif [ "$COM3" = "uri" ]; then
+                  gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f7
+                elif [ "$COM4" = "hist-ip" ]; then
+                  H_IP_LOG $var
+                elif [ "$COM5" = "load" ]; then
+                  HISTOLOAD $var
+                elif [ -z "$COM" ]; then
+                  gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI
+                fi
+              done
+            fi
+
+        # a, ip, uri:
+      elif [ "$FIL1" = "aft" ] && [ "$FIL3" = "ip" ] && [ "$FIL4" = "uri" ]; then
+        if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+          D_A $var $DTA
+          for d in $DATE_A; do
+            DAT $d
+            if [ "$COM1" = "ip" ]; then
+              grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f1
+            elif [ "$COM2" = "hosts" ]; then
+              IP=$(grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f1)
+              HOSTS $IP
+            elif [ "$COM3" = "uri" ]; then
+              grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f7
+            elif [ "$COM4" = "hist-ip" ]; then
+              H_IP_LOG $var
+            elif [ "$COM5" = "load" ]; then
+              HISTOLOAD $var
+            elif [ -z "$COM" ]; then
+              grep $DATE $var | grep $IPADDR | grep $URI
+            fi
+          done
+        elif [ "$S_CUT" = "gz" ]; then
+          D_AGZ $var $DTA
+          for d in $DATE_A; do
+            DAT $d
+            if [ "$COM1" = "ip" ]; then
+              gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f1
+            elif [ "$COM2" = "hosts" ]; then
+              IP=$(gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f1)
+              HOSTS $IP
+            elif [ "$COM3" = "uri" ]; then
+              gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f7
+            elif [ "$COM4" = "hist-ip" ]; then
+              H_IP_LOG $var
+            elif [ "$COM5" = "load" ]; then
+              HISTOLOAD $var
+            elif [ -z "$COM" ]; then
+              gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI
+            fi
+          done
+        fi
+
+        # b, ip, uri:
+    elif [ "$FIL2" = "bef" ] && [ "$FIL3" = "ip" ] && [ "$FIL4" = "uri" ]; then
+      if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        D_B $var $DTB
+        for d in $DATE_B; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            grep $DATE $var | grep $IPADDR | grep $URI | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            grep $DATE $var | grep $IPADDR | grep $URI
+          fi
+        done
+      elif [ "$S_CUT" = "gz" ]; then
+        D_BGZ $var $DTB
+        for d in $DATE_B; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            gunzip -c $var | grep $DATE | grep $IPADDR | grep $URI
+          fi
+        done
+      fi
+
+      # a, b, ip:
+      elif [ "$FIL1" = "aft" ] && [ "$FIL2" = "bef" ] && [ "$FIL3" = "ip" ]; then
+        if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+          D_AB $var $DTA $DTB
+          for d in $DATE_AB; do
+            DAT $d
+            if [ "$COM1" = "ip" ]; then
+              grep $DATE $var | grep $IPADDR | cut -d ' ' -f1
+            elif [ "$COM2" = "hosts" ]; then
+              IP=$(grep $DATE $var | grep $IPADDR | cut -d ' ' -f1)
+              HOSTS $IP
+            elif [ "$COM3" = "uri" ]; then
+              grep $DATE $var | grep $IPADDR | cut -d ' ' -f7
+            elif [ "$COM4" = "hist-ip" ]; then
+              H_IP_LOG $var
+            elif [ "$COM5" = "load" ]; then
+              HISTOLOAD $var
+            elif [ -z "$COM" ]; then
+              grep $DATE $var | grep $IPADDR
+            fi
+          done
+        elif [ "$S_CUT" = "gz" ]; then
+          D_ABGZ $var $DTA $DTB
+          for d in $DATE_AB; do
+              DAT $d
+              if [ "$COM1" = "ip" ]; then
+                gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f1
+              elif [ "$COM2" = "hosts" ]; then
+                IP=$(gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f1)
+                HOSTS $IP
+              elif [ "$COM3" = "uri" ]; then
+                gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f7
+              elif [ "$COM4" = "hist-ip" ]; then
+                H_IP_LOG $var
+              elif [ "$COM5" = "load" ]; then
+                HISTOLOAD $var
+              elif [ -z "$COM" ]; then
+                gunzip -c $var | grep $DATE | grep $IPADDR
+              fi
+          done
+        fi
+
+        # a, b, uri:
+    elif [ "$FIL1" = "aft" ] && [ "$FIL2" = "bef" ] && [ "$FIL4" = "uri" ]; then
+      if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        D_AB $var $DTA $DTB
+        for d in $DATE_AB; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            grep $DATE $var | grep $URI | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(grep $DATE $var | grep $URI | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            grep $DATE $var | grep $URI | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            grep $DATE $var | grep $URI
+          fi
+        done
+      elif [ "$S_CUT" = "gz" ]; then
+        D_ABGZ $var $DTA $DTB
+        for d in $DATE_AB; do
+            DAT $d
+            if [ "$COM1" = "ip" ]; then
+              gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f1
+            elif [ "$COM2" = "hosts" ]; then
+              IP=$(gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f1)
+              HOSTS $IP
+            elif [ "$COM3" = "uri" ]; then
+              gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f7
+            elif [ "$COM4" = "hist-ip" ]; then
+              H_IP_LOG $var
+            elif [ "$COM5" = "load" ]; then
+              HISTOLOAD $var
+            elif [ -z "$COM" ]; then
+              gunzip -c $var | grep $DATE | grep $URI
+            fi
+        done
+      fi
+
+      # a, b:
+      elif [ "$FIL1" = "aft" ] && [ "$FIL2" = "bef" ]; then
+        if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+          D_AB $var $DTA $DTB
+          for d in $DATE_AB; do
+            DAT $d
+            if [ "$COM1" = "ip" ]; then
+              grep $DATE $var | cut -d ' ' -f1
+            elif [ "$COM2" = "hosts" ]; then
+              IP=$(grep $DATE $var | cut -d ' ' -f1)
+              HOSTS $IP
+            elif [ "$COM3" = "uri" ]; then
+              grep $DATE $var | cut -d ' ' -f7
+            elif [ "$COM4" = "hist-ip" ]; then
+              H_IP_LOG $var
+            elif [ "$COM5" = "load" ]; then
+              HISTOLOAD $var
+            elif [ -z "$COM" ]; then
+              grep $DATE $var
+            fi
+          done
+        elif [ "$S_CUT" = "gz" ]; then
+          D_ABGZ $var $DTA $DTB
+          for d in $DATE_AB; do
+              DAT $d
+              if [ "$COM1" = "ip" ]; then
+                gunzip -c $var | grep $DATE | cut -d ' ' -f1
+              elif [ "$COM2" = "hosts" ]; then
+                IP=$(gunzip -c $var | grep $DATE | cut -d ' ' -f1)
+                HOSTS $IP
+              elif [ "$COM3" = "uri" ]; then
+                gunzip -c $var | grep $DATE | cut -d ' ' -f7
+              elif [ "$COM4" = "hist-ip" ]; then
+                H_IP_LOG $var
+              elif [ "$COM5" = "load" ]; then
+                HISTOLOAD $var
+              elif [ -z "$COM" ]; then
+                gunzip -c $var | grep $DATE
+              fi
+            done
+        fi
+
+        # a, ip:
+    elif  [ "$FIL1" = "aft" ] && [ "$FIL3" = "ip" ]; then
+      if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        D_A $var $DTA
+        for d in $DATE_A; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            grep $DATE $var | grep $IPADDR | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(grep $DATE $var | grep $IPADDR | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            grep $DATE $var | grep $IPADDR | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            grep $DATE $var | grep $IPADDR
+          fi
+        done
+      elif [ "$S_CUT" = "gz" ]; then
+        D_AGZ $var $DTA
+        for d in $DATE_A; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            gunzip -c $var | grep $DATE | grep $IPADDR
+          fi
+        done
+      fi
+
+      # a, uri:
+    elif  [ "$FIL1" = "aft" ] && [ "$FIL4" = "uri" ]; then
+      if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        D_A $var $DTA
+        for d in $DATE_A; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            grep $DATE $var | grep $URI | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(grep $DATE $var | grep $URI | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            grep $DATE $var | grep $URI | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            grep $DATE $var | grep $URI
+          fi
+        done
+      elif [ "$S_CUT" = "gz" ]; then
+        D_AGZ $var $DTA
+        for d in $DATE_A; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            gunzip -c $var | grep $DATE | grep $URI
+          fi
+        done
+      fi
+
+      # b, ip:
+      elif  [ "$FIL2" = "bef" ] && [ "$FIL3" = "ip" ]; then
+        if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+          D_B $var $DTB
+          for d in $DATE_B; do
+            DAT $d
+            if [ "$COM1" = "ip" ]; then
+              grep $DATE $var | grep $IPADDR | cut -d ' ' -f1
+            elif [ "$COM2" = "hosts" ]; then
+              IP=$(grep $DATE $var | grep $IPADDR | cut -d ' ' -f1)
+              HOSTS $IP
+            elif [ "$COM3" = "uri" ]; then
+              grep $DATE $var | grep $IPADDR | cut -d ' ' -f7
+            elif [ "$COM4" = "hist-ip" ]; then
+              H_IP_LOG $var
+            elif [ "$COM5" = "load" ]; then
+              HISTOLOAD $var
+            elif [ -z "$COM" ]; then
+              grep $DATE $var | grep $IPADDR
+            fi
+          done
+        elif [ "$S_CUT" = "gz" ]; then
+          D_BGZ $var $DTB
+          for d in $DATE_B; do
+            DAT $d
+            if [ "$COM1" = "ip" ]; then
+              gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f1
+            elif [ "$COM2" = "hosts" ]; then
+              IP=$(gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f1)
+              HOSTS $IP
+            elif [ "$COM3" = "uri" ]; then
+              gunzip -c $var | grep $DATE | grep $IPADDR | cut -d ' ' -f7
+            elif [ "$COM4" = "hist-ip" ]; then
+              H_IP_LOG $var
+            elif [ "$COM5" = "load" ]; then
+              HISTOLOAD $var
+            elif [ -z "$COM" ]; then
+              gunzip -c $var | grep $DATE | grep $IPADDR
+            fi
+          done
+        fi
+
+        # b, uri:
+    elif  [ "$FIL2" = "bef" ] && [ "$FIL4" = "uri" ]; then
+      if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        D_B $var $DTB
+        for d in $DATE_B; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            grep $DATE $var | grep $URI | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(grep $DATE $var | grep $URI | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            grep $DATE $var | grep $URI | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            grep $DATE $var | grep $URI
+          fi
+        done
+      elif [ "$S_CUT" = "gz" ]; then
+        D_BGZ $var $DTB
+        for d in $DATE_B; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            gunzip -c $var | grep $DATE | grep $URI | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            gunzip -c $var | grep $DATE | grep $URI
+          fi
+        done
+      fi
+
+      # ip, uri:
+    elif [ "$FIL3" = "ip" ] && [ "$FIL4" = "uri" ]; then
+      if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        if [ "$COM1" = "ip" ]; then
+          grep $IPADDR $var | grep $URI | cut -d ' ' -f1 | uniq
+        elif [ "$COM2" = "hosts" ]; then
+          IP=$(grep $IPADDR $var | grep $URI | cut -d ' ' -f1 | uniq)
+          host $IP | cut -d ' ' -f5
+        elif [ "$COM3" = "uri" ]; then
+          grep $IPADDR $var | grep $URI | cut -d ' ' -f7 | uniq
+        elif [ "$COM4" = "hist-ip" ]; then
+          H_IP_LOG $var
+        elif [  "$COM5" = "load"  ]; then
+          HISTOLOAD $var
+        elif [ -z "$COM" ]; then
+          grep $IPADDR $var | grep $URI | uniq
+        fi
+      elif [ "$S_CUT" = "gz" ]; then
+        if [ "$COM1" = "ip" ]; then
+          gunzip -c $var | grep $IPADDR | grep $URI | cut -d ' ' -f1 | uniq
+        elif [ "$COM2" = "hosts" ]; then
+          IP=$(gunzip -c $var | grep $IPADDR | grep $URI | cut -d ' ' -f1 | uniq)
+          host $IP | cut -d ' ' -f5 
+        elif [ "$COM3" = "uri" ]; then
+          gunzip -c $var | grep $IPADDR | grep $URI | cut -d ' ' -f7 | uniq
+        elif [ "$COM4" = "hist-ip" ]; then
+          H_IP_LOG $var
+        elif [ "$COM5" = "load" ]; then
+          HISTOLOAD $var
+        elif [ -z "$COM" ]; then
+          gunzip -c $var | grep $IPADDR | grep $URI | uniq
+        fi
+      fi
+
+      # a:
+    elif [ "$FIL1" = "aft" ]; then
+      if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        D_A $var $DTA
+        for d in $DATE_A; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            grep $DATE $var | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(grep $DATE $var | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            grep $DATE $var | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            grep $DATE $var
+          fi
+        done
+      elif [ "$S_CUT" = "gz" ]; then
+        D_AGZ $var $DTA
+        for d in $DATE_A; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            gunzip -c $var | grep $DATE | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(gunzip -c $var | grep $DATE | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            gunzip -c $var | grep $DATE | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            gunzip -c $var | grep $DATE
+          fi
+        done
+      fi
+
+      # b:
+    elif [ "$FIL2" = "bef" ]; then
+      if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        D_B $var $DTB
+        for d in $DATE_B; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            grep $DATE $var | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(grep $DATE $var | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            grep $DATE $var | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            grep $DATE $var
+          fi
+        done
+      elif [ "$S_CUT" = "gz" ]; then
+        D_BGZ $var $DTB
+        for d in $DATE_B; do
+          DAT $d
+          if [ "$COM1" = "ip" ]; then
+            gunzip -c $var | grep $DATE | cut -d ' ' -f1
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(gunzip -c $var | grep $DATE | cut -d ' ' -f1)
+            HOSTS $IP
+          elif [ "$COM3" = "uri" ]; then
+            gunzip -c $var | grep $DATE | cut -d ' ' -f7
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          elif [ -z "$COM" ]; then
+            gunzip -c $var | grep $DATE
+          fi
+        done
+      fi
+
+      # ip:
+    elif [ "$FIL3" = "ip" ]; then
+      if  [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        if [ "$COM1" = "ip" ]; then
+          grep $IPADDR $var | cut -d ' ' -f1 | uniq
+        elif [ "$COM2" = "hosts" ]; then
+          IP=$(cat "$var" | grep $IPADDR $var | cut -d ' ' -f1 | uniq )
+          HOSTS_B $IP
+        elif [ "$COM3" = "uri" ]; then
+          grep $IPADDR $var |  cut -d ' ' -f7 | uniq
+        elif [ "$COM4" = "hist-ip" ]; then
+          H_IP_LOG $var
+        elif [ "$COM5" = "load" ]; then
+          HISTOLOAD $var
+        elif [ -z "$COM" ]; then
+          grep $IPADDR $var
+        fi
+      elif [ "$S_CUT" = "gz" ]; then
+        if [ "$COM1" = "ip" ]; then
+          gunzip -c $var | grep $IPADDR | cut -d ' ' -f1 | uniq
+        elif [ "$COM2" = "hosts" ]; then
+          IP=$(gunzip -c $var | grep $IPADDR | cut -d ' ' -f1 | uniq)
+          HOSTS_B $IP
+        elif [ "$COM3" = "uri" ]; then
+          gunzip -c $var | grep $IPADDR | cut -d ' ' -f7 | uniq
+        elif [ "$COM4" = "hist-ip" ]; then
+          H_IP_LOG $var
+        elif [ "$COM5" = "load" ]; then
+          HISTOLOAD $var
+        elif [ -z "$COM" ]; then
+          gunzip -c $var | grep $IPADDR | uniq
+        fi
+      fi
+
+      # uri:
+    elif [ "$FIL4" = "uri" ]; then
+      if  [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+        if [ "$COM1" = "ip" ]; then
+          grep $URI $var | cut -d ' ' -f1 | uniq
+        elif [ "$COM2" = "hosts" ]; then
+          IP=$(grep $URI $var | cut -d ' ' -f1 | uniq)
+          HOSTS_B $IP
+        elif [ "$COM3" = "uri" ]; then
+          grep $URI $var |  cut -d ' ' -f7 | uniq
+        elif [ "$COM4" = "hist-ip" ]; then
+          H_IP_LOG $var
+        elif [ "$COM5" = "load" ]; then
+          HISTOLOAD $var
+        elif [ -z "$COM" ]; then
+          grep $URI $var
+        fi
+      elif [ "$S_CUT" = "gz" ]; then
+        if [ "$COM1" = "ip" ]; then
+          gunzip -c $var | grep $URI | cut -d ' ' -f1 | uniq
+        elif [ "$COM2" = "hosts" ]; then
+          IP=$(gunzip -c $var | grep $URI | cut -d ' ' -f1 | uniq)
+          HOSTS_B $IP
+        elif [ "$COM3" = "uri" ]; then
+          gunzip -c $var | grep $URI | cut -d ' ' -f7 | uniq
+        elif [ "$COM4" = "hist-ip" ]; then
+          H_IP_LOG $var
+        elif [ "$COM5" = "load" ]; then
+          HISTOLOAD $var
+        elif [ -z "$COM" ]; then
+          gunzip -c $var | grep $URI | uniq
+        fi
+      fi
+
+      # zadny filtr ani prikaz - opisovani na stdout:
+    elif [ -z "$FIL1" ] && [ -z "$FIL2" ] && [ -z "$FIL3" ] && [ -z "$FIL4" ] && [ -z $COM ]; then
+        if  [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+          cat $var
+        elif [ "$S_CUT" = "gz" ]; then
+          gunzip -c $var
+        fi
+
+        # zadny prikaz - provedeni pouze filtru:
+      elif [ -z "$FIL1" ] && [ -z "$FIL2" ] && [ -z "$FIL3" ] && [ -z "$FIL4" ]; then
+        if [ "$S_CUT" = "log" ] || [ "$S_COUNT" = "log" ]; then
+          if [ "$COM1" = "ip" ]; then
+            cat $var | cut -d ' ' -f1 | sort | uniq
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(cat $var | cut -d ' ' -f1 | sort | uniq)
+            HOSTS_B $IP
+          elif [ "$COM3" = "uri" ]; then
+            cat $var | cut -d ' ' -f7 | sort | uniq
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [  "$COM5" = "load"  ]; then
+            HISTOLOAD $var
+          fi
+        elif [ "$S_CUT" = "gz" ]; then
+          if [ "$COM1" = "ip" ]; then
+            gunzip -c $var | cut -d ' ' -f1 | sort | uniq
+          elif [ "$COM2" = "hosts" ]; then
+            IP=$(gunzip -c $var | cut -d ' ' -f1 | sort | uniq)
+            HOSTS_B $IP
+          elif [ "$COM3" = "uri" ]; then
+            gunzip -c $var | cut -d ' ' -f7 | sort | uniq
+          elif [ "$COM4" = "hist-ip" ]; then
+            H_IP_LOG $var
+          elif [ "$COM5" = "load" ]; then
+            HISTOLOAD $var
+          fi
+        fi
+      fi
+    fi
+done
